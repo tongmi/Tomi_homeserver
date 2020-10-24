@@ -1,8 +1,16 @@
 #Import some modules.
 import sys,os,socket,time,json
-#Initialize the vars.
-logs_name=str(time.strftime(r"logs/"+"%Y-%m-%d_%H-%M-%S.log", time.localtime()))
+
+#Initialize logs.
+if os.path.exists("logs")==True:
+    if os.path.isdir("logs")==False:
+        os.mkdir("logs")
+else:
+    os.mkdir("logs")
+logs_name=time.strftime(r"logs/"+"%Y-%m-%d_%H-%M-%S.log", time.localtime())
 logs=open(logs_name,"w+")
+
+#Initialize the vars.
 Program_name="Tomi_homeserver"
 Program_version=0.1
 information_backup={"hostname":"localhost","port":31317,"version":0}
@@ -11,6 +19,7 @@ keys=list(information.keys())
 server_tcp_listen=5
 server_mode=socket.SOCK_STREAM
 server=socket.socket(socket.AF_INET,server_mode)
+
 #Initialize the program.
 def init():
     #Print some infomation.
@@ -43,32 +52,33 @@ def init():
         pass
     else:
         server.listen(server_tcp_listen)
-    
-        
+
 #Define some functions.
 def info(str):
     global logs
     out=time.strftime("%Y-%m-%d %H:%M:%S"+" [Info]:"+str+"\n",time.localtime())
     print(out,end="")
     logs.write(out)
+    logs.flush()
 def err(str):
     global logs
     out=time.strftime("%Y-%m-%d %H:%M:%S"+" [Error]:"+str+"\n",time.localtime())
     print(out,end="")
     logs.write(out)
+    logs.flush()
 def connected(addr):
     global logs
     out=time.strftime("%Y-%m-%d %H:%M:%S"+" "+addr[0]+" "+str(addr[1])+" has connected."+"\n",time.localtime())
     print(out,end="")
     logs.write(out)
+    logs.flush()
 
 #Main codes.
 init()
-
 while True:
     c,addr=server.accept()
     connected(addr)
-    send_info="It is "+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())+" now."
+    send_info=time.strftime("It is %Y-%m-%d %H:%M:%S now.", time.localtime())
     c.send(send_info.encode("utf-8"))
     c.close()
 
