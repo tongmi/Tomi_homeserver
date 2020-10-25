@@ -24,20 +24,30 @@ server=socket.socket(socket.AF_INET,server_mode)
 def init():
     #Print some infomation.
     info("The programs started,initializing...")
-    #Inport some objects.
+    #Import some objects.
     global information,keys,information_backup,server,server_mode,server_tcp_listen
+    #Initialize config.json file.
     if os.path.exists("config.json")==True:
-        with open("config.json","r") as f:
-            information=json.load(f)
+        if os.path.isfile("config.json")==True:
+            with open("config.json","r") as f:
+                try:
+                    information=json.load(f)
+                except:
+                    information={}
+        else:
+            err("Please remove the directory \'config.json\'.")
+            os._exit(0)
     else:
         with open("config.json","w") as f:
             json.dump(information,f)
-        info("Initialized config.json.")
+            info("Initialized config.json.")
     #Check infomation.
     keys_now=list(information.keys())
     for i in keys:
-        if i in keys_now == False:
+        if (i in keys_now) == False:
             information=information_backup
+            with open("config.json","w") as f:
+                json.dump(information,f)
             info("Config reset.Because the config was not correct.")
             break
     #Initialize the socket of server.
