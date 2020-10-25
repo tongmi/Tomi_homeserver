@@ -181,6 +181,7 @@ def connected_admin_exit(addr):
     print(out,end="")
     logs.write(out)
     logs.flush()
+
 #Main codes.
 init()
 while True:
