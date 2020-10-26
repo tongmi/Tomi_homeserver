@@ -125,6 +125,7 @@ def ssh():
                 recv_code=c.recv(1029).decode("utf-8")
                 if recv_code=="exit":
                     connected_admin_exit(addr)
+                    c.close()
                     break
                 exec(recv_code)
         else:
