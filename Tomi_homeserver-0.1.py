@@ -13,8 +13,9 @@ logs=open(logs_name,"w+")
 #Initialize the vars.
 Program_name="Tomi_homeserver"
 Program_version=0.1
+Program_logs=True
 Program_ssh=False
-Program_ssh_password="123456"
+Program_ssh_password="031317"
 information_backup={"hostname":"localhost","port":31317,"version":0}
 information={"hostname":"localhost","port":31317,"version":0}
 keys=list(information.keys())
@@ -108,6 +109,7 @@ def init():
 
 #Initialize sh mode to run some commands that you send.
 def ssh():
+    #Waiting to be perfect. 2021.1.27
     global information
     server_ssh_socket=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
     server_ssh_socket.bind((information["hostname"],information["port"]+1))
@@ -116,13 +118,22 @@ def ssh():
     while True:
         c,addr=server_ssh_socket.accept()
         connected_admin_connected(addr)
-        c.send("Please send the admin password to the server！(UTF-8)".encode("utf-8"))
-        recv_password=c.recv(1024).decode("utf-8")
+        c.send("Please send the admin password to the server in 30 seconds！(UTF-8)".encode("utf-8"))
+        c.settimeout(29.9)
+        try:
+            recv_password=c.recv(1024).decode("utf-8")
+        except:
+            c.send("Sorry,timeout.".encode("utf-8"))
+            c.close()
+            connected_admin_loginfail(addr,"China  NB,timeout")
+            continue
+        c.settimeout(None)
         if recv_password==Program_ssh_password:
             connected_admin_logined(addr)
             c.send("Login successful.You can send some commands to the server and the server will run this codes.Type \'exit\' can cut the connecting.(UTF-8)".encode("utf-8"))
             while True:
-                recv_code=c.recv(1029).decode("utf-8")
+                #Waiting to be perfect. 2021.1.27
+                recv_code=c.recv(2048).decode("utf-8")
                 if recv_code=="exit":
                     connected_admin_exit(addr)
                     c.close()
@@ -172,7 +183,7 @@ def connected_admin_logined(addr):
     logs.flush()
 def connected_admin_loginfail(addr,recv_password):
     global logs
-    out=time.strftime("%Y-%m-%d %H:%M:%S"+" The admin "+addr[0]+" "+str(addr[1])+" login failed.He typed password is \'"+recv_password+"\'.\n",time.localtime())
+    out=time.strftime("%Y-%m-%d %H:%M:%S"+" The admin "+addr[0]+" "+str(addr[1])+" login failed.He typed password is \""+recv_password+"\".\n",time.localtime())
     print(out,end="")
     logs.write(out)
     logs.flush()
