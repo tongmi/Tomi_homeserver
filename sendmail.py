@@ -4,16 +4,17 @@ import smtplib
 from email.mime.text import MIMEText
 from email.utils import formataddr
  
-my_sender='2187487291@qq.com'    # 发件人邮箱账号
+my_sender='testmailserver@qq.com'    # 发件人邮箱账号
 my_pass = 'xkohxkotmksleagb'              # 发件人邮箱密码
-my_user='3343977167@qq.com'      # 收件人邮箱账号，我这边发送给自己
+#my_user='3343977167@qq.com'      # 收件人邮箱账号，我这边发送给自己
+my_user=input("Receiver:")
 def mail():
     ret=True
     try:
         msg=MIMEText('填写邮件内容','plain','utf-8')
-        msg['From']=formataddr(["FromRunoob",my_sender])  # 括号里的对应发件人邮箱昵称、发件人邮箱账号
-        msg['To']=formataddr(["FK",my_user])              # 括号里的对应收件人邮箱昵称、收件人邮箱账号
-        msg['Subject']="菜鸟教程发送邮件测试"                # 邮件的主题，也可以说是标题
+        msg['From']=formataddr(["测试程序",my_sender])  # 括号里的对应发件人邮箱昵称、发件人邮箱账号
+        msg['To']=formataddr(["用户",my_user])              # 括号里的对应收件人邮箱昵称、收件人邮箱账号
+        msg['Subject']="发送邮件测试"                # 邮件的主题，也可以说是标题
  
         server=smtplib.SMTP_SSL("smtp.qq.com", 465)  # 发件人邮箱中的SMTP服务器，端口是25
         server.login(my_sender, my_pass)  # 括号中对应的是发件人邮箱账号、邮箱密码
