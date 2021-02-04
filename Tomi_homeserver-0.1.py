@@ -1,4 +1,4 @@
-#/bin/python3
+#!/bin/python3
 #Import some modules.
 import sys,os,socket,time,json,_thread
 
@@ -17,8 +17,8 @@ Program_version=0.1
 Program_logs=True
 Program_ssh=False
 Program_ssh_password="031317"
-information_backup={"hostname":"localhost","port":31317,"version":0}
-information={"hostname":"localhost","port":31317,"version":0}
+information_backup={"hostname":"0.0.0.0","port":31313,"version":0}
+information=information_backup
 keys=list(information.keys())
 server_tcp_listen=5
 server_mode=socket.SOCK_STREAM
