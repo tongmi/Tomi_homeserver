@@ -1,3 +1,4 @@
+#/bin/python3
 #Import some modules.
 import sys,os,socket,time,json,_thread
 
