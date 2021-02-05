@@ -2,14 +2,9 @@
 #Import some modules.
 import sys,os,socket,time,json,_thread
 
-#Initialize logs.
-if os.path.exists("logs")==True:
-    if os.path.isdir("logs")==False:
-        os.mkdir("logs")
-else:
-    os.mkdir("logs")
-logs_name=time.strftime(r"logs/"+"%Y-%m-%d_%H-%M-%S.log", time.localtime())
-logs=open(logs_name,"w+")
+#ERROR_CODE
+NO_ERROR=0
+UNABLE_TO_DO=-1
 
 #Initialize the vars.
 Program_name="Tomi_homeserver"
@@ -35,19 +30,36 @@ Tomi_homeserver 0.1 Help
 -hostname/-h/-ip <hostname>     修改使用的主机名（不修改config.json的配置）
 -port/-Port/-p <port>     修改使用的端口（不修改config.json的配置）
 -ssh/-s/-S      启用远程ssh连接服务器
+-unlog/-ul      关闭日志流(实验功能)
 
 """
 
+#Helpful infomation and information of the version.
+for i in range(0,len(sys.argv)):
+    if sys.argv[i]=="-unlog" or sys.argv[i]=="-ul":
+        if Program_logs==True:
+            Program_logs=False
+    if sys.argv[i]=="-h" or sys.argv[i]=="-help" or sys.argv[i]=="-Help":
+        print(help_infomation)
+        os._exit(0)
+    if sys.argv[i]=="-v" or sys.argv[i]=="-version" or sys.argv[i]=="-Version":
+        print(Program_name+" "+str(Program_version))
+        os._exit(0)
+
+#Initialize logs.
+if Program_logs==True:
+    if os.path.exists("logs")==True:
+        if os.path.isdir("logs")==False:
+            os.mkdir("logs")
+    else:
+        os.mkdir("logs")
+    logs_name=time.strftime(r"logs/"+"%Y-%m-%d_%H-%M-%S.log", time.localtime())
+    logs=open(logs_name,"w+")
+else:
+    print("Kernel:The stream of logs closed.")
+
 #Initialize the program.
 def init():
-    #Helpful infomation and information of the version.
-    for i in range(0,len(sys.argv)):
-        if sys.argv[i]=="-h" or sys.argv[i]=="-help" or sys.argv[i]=="-Help":
-            info(help_infomation)
-            os._exit(0)
-        if sys.argv[i]=="-v" or sys.argv[i]=="-version" or sys.argv[i]=="-Version":
-            info(Program_name+" "+str(Program_version))
-            os._exit(0)
     #Print some infomation before initializing.
     info("The programs started,initializing...")
     #Import some objects.
@@ -150,58 +162,64 @@ def info(str):
     global logs
     out=time.strftime("%Y-%m-%d %H:%M:%S"+" [Info]:"+str+"\n",time.localtime())
     print(out,end="")
-    logs.write(out)
-    logs.flush()
+    write_logs(out)
 def warn(str):
     global logs
     out=time.strftime("%Y-%m-%d %H:%M:%S"+" [Warning]:"+str+"\n",time.localtime())
     print(out,end="")
-    logs.write(out)
-    logs.flush()
+    write_logs(out)
 def err(str):
     global logs
     out=time.strftime("%Y-%m-%d %H:%M:%S"+" [Error]:"+str+"\n",time.localtime())
     print(out,end="")
-    logs.write(out)
-    logs.flush()
+    write_logs(out)
 def connected(addr):
     global logs
     out=time.strftime("%Y-%m-%d %H:%M:%S"+" "+addr[0]+" "+str(addr[1])+" has connected."+"\n",time.localtime())
     print(out,end="")
-    logs.write(out)
-    logs.flush()
+    write_logs(out)
 def connected_admin_connected(addr):
     global logs
     out=time.strftime("%Y-%m-%d %H:%M:%S"+" The admin "+addr[0]+" "+str(addr[1])+" has connected."+"\n",time.localtime())
     print(out,end="")
-    logs.write(out)
-    logs.flush()
+    write_logs(out)
 def connected_admin_logined(addr):
     global logs
     out=time.strftime("%Y-%m-%d %H:%M:%S"+" The admin "+addr[0]+" "+str(addr[1])+" has login."+"\n",time.localtime())
     print(out,end="")
-    logs.write(out)
-    logs.flush()
+    write_logs(out)
 def connected_admin_loginfail(addr,recv_password):
     global logs
     out=time.strftime("%Y-%m-%d %H:%M:%S"+" The admin "+addr[0]+" "+str(addr[1])+" login failed.He typed password is \""+recv_password+"\".\n",time.localtime())
     print(out,end="")
-    logs.write(out)
-    logs.flush()
+    write_logs(out)
 def connected_admin_exit(addr):
     global logs
     out=time.strftime("%Y-%m-%d %H:%M:%S"+" The admin "+addr[0]+" "+str(addr[1])+" exited."+"\n",time.localtime())
     print(out,end="")
-    logs.write(out)
-    logs.flush()
+    write_logs(out)
+def write_logs(string):
+    global logs
+    if Program_logs==True:
+        logs.write(string)
+        logs.flush()
+        return NO_ERROR
+    else:
+        return UNABLE_TO_DO
 
 #Main codes.
 init()
-while True:
-    c,addr=server.accept()
-    connected(addr)
-    send_info=time.strftime("It is %Y-%m-%d %H:%M:%S now.", time.localtime())
-    c.send(send_info.encode("utf-8"))
-    c.close()
+try:
+    while True:
+        c,addr=server.accept()
+        connected(addr)
+        end_info=time.strftime("It is %Y-%m-%d %H:%M:%S now.", time.localtime())
+        c.send(send_info.encode("utf-8"))
+        c.close()
+except:
+    server.close()
+    info("Program is exiting.")
+    os._exit(0)
+
 
 
