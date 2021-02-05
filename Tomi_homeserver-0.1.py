@@ -220,6 +220,3 @@ except:
     server.close()
     info("Program is exiting.")
     os._exit(0)
-
-
-
