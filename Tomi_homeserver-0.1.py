@@ -34,6 +34,36 @@ Tomi_homeserver 0.1 Help
 
 """
 
+#Define classes
+class socket_server:
+    error=NO_ERROR
+    hostname=""
+    port=520
+    listen=5
+    mode=socket.SOCK_STREAM
+    server=None
+    server_is_running=False
+    def __init__(self,ip="",p=520,l=5,m=socket.SOCK_STREAM):
+        self.hostname=ip
+        self.port=p
+        self.listen=l
+        self.mode=m
+        try:
+            self.server=socket.socket(socket.AF_INET,self.mode)
+            self.server.bind((self.hostname,self.port))
+            self.server.listen(self.listen)
+            self.server_is_running=True
+        except Exception as buf:
+            error=UNABLE_TO_DO
+            err(str(buf))
+    def close(self):
+        if self.server_is_running==True:
+            self.server.close()
+            self.server_is_running=False
+            return NO_ERROR
+        else:
+            return UNABLE_TO_DO
+
 #Helpful infomation and information of the version.
 for i in range(0,len(sys.argv)):
     if sys.argv[i]=="-unlog" or sys.argv[i]=="-ul":
@@ -56,7 +86,7 @@ if Program_logs==True:
     logs_name=time.strftime(r"logs/"+"%Y-%m-%d_%H-%M-%S.log", time.localtime())
     logs=open(logs_name,"w+")
 else:
-    print("Kernel:The stream of logs closed.")
+    print(time.strftime("[%H:%M:%S]"+" [main/KERNEL]:The stream of logs closed.\n",time.localtime()))
 
 #Initialize the program.
 def init():
@@ -118,6 +148,7 @@ def init():
         server.listen(server_tcp_listen)
     #If ssh service is on,run this codes.
     if Program_ssh==True:
+        #Wait to be perfect Use the new threads.
         _thread.start_new_thread(ssh,())
 
 #Initialize sh mode to run some commands that you send.
@@ -128,74 +159,81 @@ def ssh():
     server_ssh_socket.bind((information["hostname"],information["port"]+1))
     server_ssh_socket.listen(server_tcp_listen)
     info("Ssh service of the server("+information["hostname"]+") was running at the port "+str(information["port"]+1)+".")
-    while True:
-        c,addr=server_ssh_socket.accept()
-        connected_admin_connected(addr)
-        c.send("Please send the admin password to the server in 30 seconds！(UTF-8)".encode("utf-8"))
-        c.settimeout(29.9)
-        try:
-            recv_password=c.recv(1024).decode("utf-8")
-        except:
-            c.send("Sorry,timeout.".encode("utf-8"))
-            c.close()
-            connected_admin_loginfail(addr,"China  NB,timeout")
-            continue
-        c.settimeout(None)
-        if recv_password==Program_ssh_password:
-            connected_admin_logined(addr)
-            c.send("Login successful.You can send some commands to the server and the server will run this codes.Type \'exit\' can cut the connecting.(UTF-8)".encode("utf-8"))
-            while True:
-                #Waiting to be perfect. 2021.1.27
-                recv_code=c.recv(2048).decode("utf-8")
-                if recv_code=="exit":
-                    connected_admin_exit(addr)
-                    c.close()
-                    break
-                exec(recv_code)
-        else:
-            connected_admin_loginfail(addr,recv_password)
-            c.send("Password error.Cut the connecting.".encode("utf-8"))
-            c.close()
+    try:
+        while True:
+            c,addr=server_ssh_socket.accept()
+            connected_admin_connected(addr)
+            c.send("Please send the admin password to the server in 30 seconds！(UTF-8)".encode("utf-8"))
+            c.settimeout(29.9)
+            try:
+                recv_password=c.recv(1024).decode("utf-8")
+            except:
+                c.send("Sorry,timeout.".encode("utf-8"))
+                c.close()
+                connected_admin_loginfail(addr,"China  NB,timeout")
+                continue
+            c.settimeout(None)
+            if recv_password==Program_ssh_password:
+                connected_admin_logined(addr)
+                c.send("Login successful.You can send the server codes to run.Type \'exit\' can cut the connecting.(UTF-8)".encode("utf-8"))
+                while True:
+                    #Waiting to be perfect. 2021.2.05 下次加入多线程运行
+                    recv_code=c.recv(2048+4).decode("utf-8")
+                    info("Command: "+recv_code)
+                    if recv_code=="exit":
+                        connected_admin_exit(addr)
+                        c.close()
+                        break
+                    try:
+                        exec(recv_code)
+                    except Exception as buf:
+                        err(str(buf))
+            else:
+                connected_admin_loginfail(addr,recv_password)
+                c.send("Password error.Cut the connecting.".encode("utf-8"))
+                c.close()
+    except:
+        server_ssh_socket.close()
 
 #Define some functions.
 def info(str):
     global logs
-    out=time.strftime("%Y-%m-%d %H:%M:%S"+" [Info]:"+str+"\n",time.localtime())
+    out=time.strftime("[%H:%M:%S]"+" [Info]:"+str+"\n",time.localtime())
     print(out,end="")
     write_logs(out)
 def warn(str):
     global logs
-    out=time.strftime("%Y-%m-%d %H:%M:%S"+" [Warning]:"+str+"\n",time.localtime())
+    out=time.strftime("[%H:%M:%S]"+" [Warning]:"+str+"\n",time.localtime())
     print(out,end="")
     write_logs(out)
 def err(str):
     global logs
-    out=time.strftime("%Y-%m-%d %H:%M:%S"+" [Error]:"+str+"\n",time.localtime())
+    out=time.strftime("[%H:%M:%S]"+" [Error]:"+str+"\n",time.localtime())
     print(out,end="")
     write_logs(out)
 def connected(addr):
     global logs
-    out=time.strftime("%Y-%m-%d %H:%M:%S"+" "+addr[0]+" "+str(addr[1])+" has connected."+"\n",time.localtime())
+    out=time.strftime("[%H:%M:%S]"+" "+addr[0]+" "+str(addr[1])+" has connected."+"\n",time.localtime())
     print(out,end="")
     write_logs(out)
 def connected_admin_connected(addr):
     global logs
-    out=time.strftime("%Y-%m-%d %H:%M:%S"+" The admin "+addr[0]+" "+str(addr[1])+" has connected."+"\n",time.localtime())
+    out=time.strftime("[%H:%M:%S]"+" The admin "+addr[0]+" "+str(addr[1])+" has connected."+"\n",time.localtime())
     print(out,end="")
     write_logs(out)
 def connected_admin_logined(addr):
     global logs
-    out=time.strftime("%Y-%m-%d %H:%M:%S"+" The admin "+addr[0]+" "+str(addr[1])+" has login."+"\n",time.localtime())
+    out=time.strftime("[%H:%M:%S]"+" The admin "+addr[0]+" "+str(addr[1])+" has login."+"\n",time.localtime())
     print(out,end="")
     write_logs(out)
 def connected_admin_loginfail(addr,recv_password):
     global logs
-    out=time.strftime("%Y-%m-%d %H:%M:%S"+" The admin "+addr[0]+" "+str(addr[1])+" login failed.He typed password is \""+recv_password+"\".\n",time.localtime())
+    out=time.strftime("[%H:%M:%S]"+" The admin "+addr[0]+" "+str(addr[1])+" login failed.He typed password is \""+recv_password+"\".\n",time.localtime())
     print(out,end="")
     write_logs(out)
 def connected_admin_exit(addr):
     global logs
-    out=time.strftime("%Y-%m-%d %H:%M:%S"+" The admin "+addr[0]+" "+str(addr[1])+" exited."+"\n",time.localtime())
+    out=time.strftime("[%H:%M:%S]"+" The admin "+addr[0]+" "+str(addr[1])+" exited."+"\n",time.localtime())
     print(out,end="")
     write_logs(out)
 def write_logs(string):
@@ -213,7 +251,7 @@ try:
     while True:
         c,addr=server.accept()
         connected(addr)
-        end_info=time.strftime("It is %Y-%m-%d %H:%M:%S now.", time.localtime())
+        end_info=time.strftime("It is [%H:%M:%S] now.", time.localtime())
         c.send(send_info.encode("utf-8"))
         c.close()
 except:
