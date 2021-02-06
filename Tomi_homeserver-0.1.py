@@ -177,7 +177,7 @@ def init():
         server.listen(server_tcp_listen)
     #If ssh service is on,run this codes.
     if Program_ssh==True:
-        #Wait to be perfect Use the new threads.
+        #Wait to be perfect Use the new threads. 2.6
         _thread.start_new_thread(ssh,())
 
 #Initialize sh mode to run some commands that you send.
