@@ -280,11 +280,11 @@ try:
     while True:
         c,addr=server.accept()
         connected(addr)
-        end_info=time.strftime("It is [%H:%M:%S] now.", time.localtime())
+        send_info=time.strftime("It is [%H:%M:%S] now.", time.localtime())
         c.send(send_info.encode("utf-8"))
         c.close()
 except Exception as buf:
     server.close()
-    err(buf)
+    err(str(buf))
     info("Program is exiting.")
     os._exit(0)
