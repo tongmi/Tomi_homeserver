@@ -280,9 +280,13 @@ try:
     while True:
         c,addr=server.accept()
         connected(addr)
-        send_info=time.strftime("It is [%H:%M:%S] now.", time.localtime())
+        send_info=time.strftime("It is %Y-%m-%d %H-%M-%S now.", time.localtime())
         c.send(send_info.encode("utf-8"))
         c.close()
+except KeyboardInterrupt:
+    server.close()
+    info("Program is exiting.")
+    os._exit(0)
 except Exception as buf:
     server.close()
     err(str(buf))
