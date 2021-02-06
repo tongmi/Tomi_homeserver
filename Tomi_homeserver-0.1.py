@@ -56,10 +56,39 @@ class socket_server:
         except Exception as buf:
             error=UNABLE_TO_DO
             err(str(buf))
+    def __del__(self):
+        self.close()
     def close(self):
         if self.server_is_running==True:
             self.server.close()
             self.server_is_running=False
+            return NO_ERROR
+        else:
+            return UNABLE_TO_DO
+class socket_client:
+    error=NO_ERROR
+    hostname=""
+    port=None
+    mode=socket.SOCK_STREAM
+    client=None
+    client_is_running=False
+    def __init__(self,ip="",p=None,m=socket.SOCK_STREAM):
+        self.mode=m
+        try:
+            self.client=socket.socket(socket.AF_INET,self.mode)
+            if type(p)==int
+                self.client.bind((self.hostname,self.port))
+            self.client_is_running=True
+            self.hostname,self.port=self.client.getsockname()
+        except Exception as buf:
+            error=UNABLE_TO_DO
+            err(str(buf))
+    def __del__(self):
+        self.close()
+    def close(self):
+        if self.client_is_running==True:
+            self.client.close()
+            self.client_is_running=False
             return NO_ERROR
         else:
             return UNABLE_TO_DO
