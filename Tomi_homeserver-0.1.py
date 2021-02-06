@@ -114,8 +114,13 @@ if Program_logs==True:
         os.mkdir("logs")
     logs_name=time.strftime(r"logs/"+"%Y-%m-%d_%H-%M-%S.log", time.localtime())
     logs=open(logs_name,"w+")
+    buffer=time.strftime("[%H:%M:%S]"+" [main/KERNEL]:Create the log \""+logs_name+"\".\n",time.localtime())
+    print(buffer,end="")
+    logs.write(buffer)
+    logs.flush()
+    del buffer
 else:
-    print(time.strftime("[%H:%M:%S]"+" [main/KERNEL]:The stream of logs closed.\n",time.localtime()))
+    print(time.strftime("[%H:%M:%S]"+" [main/KERNEL]:The stream of logs closed.",time.localtime()))
 
 #Initialize the program.
 def init():
@@ -283,11 +288,11 @@ try:
         send_info=time.strftime("It is %Y-%m-%d %H:%M:%S now.", time.localtime())
         c.send(send_info.encode("utf-8"))
         c.close()
-except KeyboardInterrupt:
+except KeyboardInterrupt as buf:
     server.close()
     info("Program is exiting.")
     os._exit(0)
-except Exception as buf:
+except Exception as buf: 
     server.close()
     err(str(buf))
     info("Program is exiting.")

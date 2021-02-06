@@ -6,7 +6,7 @@ except:
     print("未知错误.\nUnkown error.")
     exit()
 try:
-    c.connect(("",31313))
+    c.connect(("tongmios.iask.in",30577))
 except:
     print("服务器离线。\nThe server is offline.")
     c.close()
