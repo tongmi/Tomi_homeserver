@@ -1,27 +1,31 @@
 #!/bin/python3
 # -*- coding: UTF-8 -*-
-#Import some modules.
-import sys,os,socket,time,json,threading
+# Import some modules.
+import sys
+import os
+import socket
+import time
+import json
+import threading
+# ERROR_CODE
+NO_ERROR = 0
+UNABLE_TO_DO = -1
 
-#ERROR_CODE
-NO_ERROR=0
-UNABLE_TO_DO=-1
+# Initialize the vars.
+Program_name = "Tomi_homeserver"
+Program_version = 0.1
+Program_logs = True
+Program_ssh = False
+Program_ssh_password = "031317"
+information_backup = {"hostname": "0.0.0.0", "port": 31313, "version": 0}
+information = information_backup
+keys = list(information.keys())
+server_tcp_listen = 5
+server_mode = socket.SOCK_STREAM
+server = socket.socket(socket.AF_INET, server_mode)
 
-#Initialize the vars.
-Program_name="Tomi_homeserver"
-Program_version=0.1
-Program_logs=True
-Program_ssh=False
-Program_ssh_password="031317"
-information_backup={"hostname":"0.0.0.0","port":31313,"version":0}
-information=information_backup
-keys=list(information.keys())
-server_tcp_listen=5
-server_mode=socket.SOCK_STREAM
-server=socket.socket(socket.AF_INET,server_mode)
-
-#Help information var define.
-help_infomation="""
+# Help information var define.
+help_infomation = """
 
 Tomi_homeserver 0.1 Help
 
@@ -35,34 +39,38 @@ Tomi_homeserver 0.1 Help
 
 """
 
-#Define classes
+# Define classes
+
+
 class socket_server:
-    error=NO_ERROR
-    hostname=""
-    port=520
-    listen=5
-    mode=socket.SOCK_STREAM
-    server=None
-    server_is_running=False
-    def __init__(self,ip="",p=520,l=5,m=socket.SOCK_STREAM):
-        self.hostname=ip
-        self.port=p
-        self.listen=l
-        self.mode=m
+    error = NO_ERROR
+    hostname = ""
+    port = 520
+    listen = 5
+    mode = socket.SOCK_STREAM
+    server = None
+    server_is_running = False
+
+    def __init__(self, ip="", p=520, l=5, m=socket.SOCK_STREAM):
+        self.hostname = ip
+        self.port = p
+        self.listen = l
+        self.mode = m
         try:
-            self.server=socket.socket(socket.AF_INET,self.mode)
-            self.server.bind((self.hostname,self.port))
+            self.server = socket.socket(socket.AF_INET, self.mode)
+            self.server.bind((self.hostname, self.port))
             self.server.listen(self.listen)
-            self.server_is_running=True
+            self.server_is_running = True
         except Exception as buf:
-            error=UNABLE_TO_DO
             err(str(buf))
+
     def __del__(self):
         self.close()
+
     def close(self):
-        if self.server_is_running==True:
+        if self.server_is_running is True:
             self.server.close()
-            self.server_is_running=False
+            self.server_is_running = False
             return NO_ERROR
         else:
             return UNABLE_TO_DO
