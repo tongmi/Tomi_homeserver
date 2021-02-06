@@ -1,6 +1,6 @@
 #!/bin/python3
 #Import some modules.
-import sys,os,socket,time,json,_thread
+import sys,os,socket,time,json,threading
 
 #ERROR_CODE
 NO_ERROR=0
@@ -92,6 +92,11 @@ class socket_client:
             return NO_ERROR
         else:
             return UNABLE_TO_DO
+class thread_server_ssh(threading.Thread):
+#    def __init__(self):
+#        self.name="ssh"
+    def run(self):
+        ssh()
 
 #Helpful infomation and information of the version.
 for i in range(0,len(sys.argv)):
@@ -183,7 +188,8 @@ def init():
     #If ssh service is on,run this codes.
     if Program_ssh==True:
         #Wait to be perfect Use the new threads. 2.6
-        _thread.start_new_thread(ssh,())
+        t_ssh=thread_server_ssh()
+        t_ssh.start()
 
 #Initialize sh mode to run some commands that you send.
 def ssh():
@@ -228,6 +234,7 @@ def ssh():
                 c.close()
     except:
         server_ssh_socket.close()
+        info("Ssh service is exiting.")
 
 #Define some functions.
 def info(str):
@@ -282,6 +289,7 @@ def write_logs(string):
 #Main codes.
 init()
 try:
+    info("Start to accept users.")
     while True:
         c,addr=server.accept()
         connected(addr)
