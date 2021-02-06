@@ -283,7 +283,8 @@ try:
         end_info=time.strftime("It is [%H:%M:%S] now.", time.localtime())
         c.send(send_info.encode("utf-8"))
         c.close()
-except:
+except Exception as buf:
     server.close()
+    err(buf)
     info("Program is exiting.")
     os._exit(0)
