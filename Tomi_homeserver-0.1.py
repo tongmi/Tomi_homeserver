@@ -76,7 +76,7 @@ class socket_client:
         self.mode=m
         try:
             self.client=socket.socket(socket.AF_INET,self.mode)
-            if type(p)==int
+            if type(p)==int:
                 self.client.bind((self.hostname,self.port))
             self.client_is_running=True
             self.hostname,self.port=self.client.getsockname()
