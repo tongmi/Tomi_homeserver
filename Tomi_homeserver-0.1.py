@@ -1,4 +1,5 @@
 #!/bin/python3
+# -*- coding: UTF-8 -*-
 #Import some modules.
 import sys,os,socket,time,json,threading
 
@@ -93,40 +94,85 @@ class socket_client:
         else:
             return UNABLE_TO_DO
 class thread_server_ssh(threading.Thread):
-#    def __init__(self):
-#        self.name="ssh"
     def run(self):
         ssh()
 
-#Helpful infomation and information of the version.
-for i in range(0,len(sys.argv)):
-    if sys.argv[i]=="-unlog" or sys.argv[i]=="-ul":
-        if Program_logs==True:
-            Program_logs=False
-    if sys.argv[i]=="-h" or sys.argv[i]=="-help" or sys.argv[i]=="-Help":
-        print(help_infomation)
-        os._exit(0)
-    if sys.argv[i]=="-v" or sys.argv[i]=="-version" or sys.argv[i]=="-Version":
-        print(Program_name+" "+str(Program_version))
-        os._exit(0)
-
-#Initialize logs.
-if Program_logs==True:
-    if os.path.exists("logs")==True:
-        if os.path.isdir("logs")==False:
-            os.mkdir("logs")
+#Define some functions.
+def info(str):
+    str_type=if_main_thread()+"/"+"INFO"
+    write_screen(str_type,str)
+def warn(str):
+    str_type=if_main_thread()+"/"+"WARN"
+    write_screen(str_type,str)
+def err(str):
+    str_type=if_main_thread()+"/"+"ERROR"
+    write_screen(str_type,str)
+def if_main_thread():
+    if threading.current_thread().name == "MainThread":
+        return "Main"
     else:
-        os.mkdir("logs")
-    logs_name=time.strftime(r"logs/"+"%Y-%m-%d_%H-%M-%S.log", time.localtime())
-    logs=open(logs_name,"w+")
-    buffer=time.strftime("[%H:%M:%S]"+" [Main/KERNEL]:Create the log \""+logs_name+"\".\n",time.localtime())
-    print(buffer,end="")
-    logs.write(buffer)
-    logs.flush()
-    del buffer
-else:
-    print(time.strftime("[%H:%M:%S]"+" [Main/KERNEL]:The stream of logs closed.",time.localtime()))
+        return "Thread"
+def write_screen(str_class,str):
+    out=time.strftime("[%H:%M:%S]"+" ["+str_class+"]:"+str+"\n",time.localtime())
+    print(out,end="")
+    write_logs(out)
+def write_logs(string):
+    global logs
+    if Program_logs==True:
+        logs.write(string)
+        logs.flush()
+        return NO_ERROR
+    else:
+        return UNABLE_TO_DO
 
+def connected(addr):
+    out=time.strftime("[%H:%M:%S]"+" "+addr[0]+" "+str(addr[1])+" has connected.",time.localtime())
+    info(out)
+def connected_admin_connected(addr):
+    out=time.strftime("[%H:%M:%S]"+" The admin "+addr[0]+" "+str(addr[1])+" has connected.",time.localtime())
+    info(out)
+def connected_admin_logined(addr):
+    out=time.strftime("[%H:%M:%S]"+" The admin "+addr[0]+" "+str(addr[1])+" has login.",time.localtime())
+    info(out)
+def connected_admin_loginfail(addr,recv_password):
+    out=time.strftime("[%H:%M:%S]"+" The admin "+addr[0]+" "+str(addr[1])+" login failed.He typed password is \""+recv_password+"\".",time.localtime())
+    info(out)
+def connected_admin_exit(addr):
+    out=time.strftime("[%H:%M:%S]"+" The admin "+addr[0]+" "+str(addr[1])+" exited.",time.localtime())
+    info(out)
+
+#---#############CUTING##############---#
+#Helpful infomation and information of the version.
+def help_and_so_on():
+    global Program_logs
+    for i in range(0,len(sys.argv)):
+        if sys.argv[i]=="-unlog" or sys.argv[i]=="-ul":
+            if Program_logs==True:
+                Program_logs=False
+        if sys.argv[i]=="-h" or sys.argv[i]=="-help" or sys.argv[i]=="-Help":
+            print(help_infomation)
+            os._exit(0)
+        if sys.argv[i]=="-v" or sys.argv[i]=="-version" or sys.argv[i]=="-Version":
+            print(Program_name+" "+str(Program_version))
+            os._exit(0)
+#Initialize logs.
+def start_logs():
+    global logs
+    if Program_logs==True:
+        if os.path.exists("logs")==True:
+            if os.path.isdir("logs")==False:
+                os.mkdir("logs")
+        else:
+            os.mkdir("logs")
+        logs_name=time.strftime(r"logs/"+"%Y-%m-%d_%H-%M-%S.log", time.localtime())
+        logs=open(logs_name,"w+")
+        buffer=time.strftime("[%H:%M:%S]"+" [Main/KERNEL]:Create the log \""+logs_name+"\".\n",time.localtime())
+        print(buffer,end="")
+        logs.write(buffer)
+        logs.flush()
+        del buffer
+    else:
+        print(time.strftime("[%H:%M:%S]"+" [Main/KERNEL]:The stream of logs closed.",time.localtime()))
 #Initialize the program.
 def init():
     #Print some infomation before initializing.
@@ -235,53 +281,12 @@ def ssh():
     except:
         server_ssh_socket.close()
         info("Ssh service is exiting.")
-
-#Define some functions.
-def info(str):
-    str_type=if_main_thread()+"/"+"INFO"
-    write_screen(str_type,str)
-def warn(str):
-    str_type=if_main_thread()+"/"+"WARN"
-    write_screen(str_type,str)
-def err(str):
-    str_type=if_main_thread()+"/"+"ERROR"
-    write_screen(str_type,str)
-def if_main_thread():
-    if threading.current_thread().name == "MainThread":
-        return "Main"
-    else:
-        return "Thread"
-def write_screen(str_class,str):
-    out=time.strftime("[%H:%M:%S]"+" ["+str_class+"]:"+str+"\n",time.localtime())
-    print(out,end="")
-    write_logs(out)
-def write_logs(string):
-    global logs
-    if Program_logs==True:
-        logs.write(string)
-        logs.flush()
-        return NO_ERROR
-    else:
-        return UNABLE_TO_DO
-
-def connected(addr):
-    out=time.strftime("[%H:%M:%S]"+" "+addr[0]+" "+str(addr[1])+" has connected.",time.localtime())
-    info(out)
-def connected_admin_connected(addr):
-    out=time.strftime("[%H:%M:%S]"+" The admin "+addr[0]+" "+str(addr[1])+" has connected.",time.localtime())
-    info(out)
-def connected_admin_logined(addr):
-    out=time.strftime("[%H:%M:%S]"+" The admin "+addr[0]+" "+str(addr[1])+" has login.",time.localtime())
-    info(out)
-def connected_admin_loginfail(addr,recv_password):
-    out=time.strftime("[%H:%M:%S]"+" The admin "+addr[0]+" "+str(addr[1])+" login failed.He typed password is \""+recv_password+"\".",time.localtime())
-    info(out)
-def connected_admin_exit(addr):
-    out=time.strftime("[%H:%M:%S]"+" The admin "+addr[0]+" "+str(addr[1])+" exited.",time.localtime())
-    info(out)
-
+def main():
+    help_and_so_on()
+    start_logs()
+    init()
 #Main codes.
-init()
+main()
 try:
     info("Start to accept users.")
     while True:

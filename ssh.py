@@ -1,4 +1,5 @@
 #!/bin/python3
+# -*- coding: UTF-8 -*-
 import socket as s
 from _thread import start_new_thread as t
 c=s.socket()

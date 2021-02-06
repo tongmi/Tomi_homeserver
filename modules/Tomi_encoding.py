@@ -1,12 +1,14 @@
+#!/bin/python3
+# -*- coding: UTF-8 -*-
 #File Tomi_Encoding.py
 #Tomi_Encoding Module on Linux
 #Version:0.1
 #Producer:Qinian
 #QQ:3343977167
 #codes list
-codelist=r"abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+codelist=r"abcdefghijklmnopqrstuvwxyz ABCDEFGHIJK-LMNOPQRSTUVWXYZ.()"
 #encodding list
-encodinglist=r"8asfDghjklwertyuiopmnbzxcvqZX0VBN3ASdFGHJKLP9WERTYUIO"
+encodinglist=r"8a~sfDghjk_lwertyuiop=mnbzxc>vqZX0VBN3ASdFGHJKLP9WERTYUIO"
 #Functions
 def encode(code):
     lenth=len(code)
