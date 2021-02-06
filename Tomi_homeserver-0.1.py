@@ -119,13 +119,13 @@ if Program_logs==True:
         os.mkdir("logs")
     logs_name=time.strftime(r"logs/"+"%Y-%m-%d_%H-%M-%S.log", time.localtime())
     logs=open(logs_name,"w+")
-    buffer=time.strftime("[%H:%M:%S]"+" [main/KERNEL]:Create the log \""+logs_name+"\".\n",time.localtime())
+    buffer=time.strftime("[%H:%M:%S]"+" [Main/KERNEL]:Create the log \""+logs_name+"\".\n",time.localtime())
     print(buffer,end="")
     logs.write(buffer)
     logs.flush()
     del buffer
 else:
-    print(time.strftime("[%H:%M:%S]"+" [main/KERNEL]:The stream of logs closed.",time.localtime()))
+    print(time.strftime("[%H:%M:%S]"+" [Main/KERNEL]:The stream of logs closed.",time.localtime()))
 
 #Initialize the program.
 def init():
@@ -220,7 +220,7 @@ def ssh():
                     #Waiting to be perfect. 2021.2.05 下次加入多线程运行
                     recv_code=c.recv(2048+4).decode("utf-8")
                     info("Command: "+recv_code)
-                    if recv_code=="exit":
+                    if recv_code == "exit":
                         connected_admin_exit(addr)
                         c.close()
                         break
@@ -238,43 +238,21 @@ def ssh():
 
 #Define some functions.
 def info(str):
-    global logs
-    out=time.strftime("[%H:%M:%S]"+" [Info]:"+str+"\n",time.localtime())
-    print(out,end="")
-    write_logs(out)
+    str_type=if_main_thread()+"/"+"INFO"
+    write_screen(str_type,str)
 def warn(str):
-    global logs
-    out=time.strftime("[%H:%M:%S]"+" [Warning]:"+str+"\n",time.localtime())
-    print(out,end="")
-    write_logs(out)
+    str_type=if_main_thread()+"/"+"WARN"
+    write_screen(str_type,str)
 def err(str):
-    global logs
-    out=time.strftime("[%H:%M:%S]"+" [Error]:"+str+"\n",time.localtime())
-    print(out,end="")
-    write_logs(out)
-def connected(addr):
-    global logs
-    out=time.strftime("[%H:%M:%S]"+" "+addr[0]+" "+str(addr[1])+" has connected."+"\n",time.localtime())
-    print(out,end="")
-    write_logs(out)
-def connected_admin_connected(addr):
-    global logs
-    out=time.strftime("[%H:%M:%S]"+" The admin "+addr[0]+" "+str(addr[1])+" has connected."+"\n",time.localtime())
-    print(out,end="")
-    write_logs(out)
-def connected_admin_logined(addr):
-    global logs
-    out=time.strftime("[%H:%M:%S]"+" The admin "+addr[0]+" "+str(addr[1])+" has login."+"\n",time.localtime())
-    print(out,end="")
-    write_logs(out)
-def connected_admin_loginfail(addr,recv_password):
-    global logs
-    out=time.strftime("[%H:%M:%S]"+" The admin "+addr[0]+" "+str(addr[1])+" login failed.He typed password is \""+recv_password+"\".\n",time.localtime())
-    print(out,end="")
-    write_logs(out)
-def connected_admin_exit(addr):
-    global logs
-    out=time.strftime("[%H:%M:%S]"+" The admin "+addr[0]+" "+str(addr[1])+" exited."+"\n",time.localtime())
+    str_type=if_main_thread()+"/"+"ERROR"
+    write_screen(str_type,str)
+def if_main_thread():
+    if threading.current_thread().name == "MainThread":
+        return "Main"
+    else:
+        return "Thread"
+def write_screen(str_class,str):
+    out=time.strftime("[%H:%M:%S]"+" ["+str_class+"]:"+str+"\n",time.localtime())
     print(out,end="")
     write_logs(out)
 def write_logs(string):
@@ -285,6 +263,22 @@ def write_logs(string):
         return NO_ERROR
     else:
         return UNABLE_TO_DO
+
+def connected(addr):
+    out=time.strftime("[%H:%M:%S]"+" "+addr[0]+" "+str(addr[1])+" has connected.",time.localtime())
+    info(out)
+def connected_admin_connected(addr):
+    out=time.strftime("[%H:%M:%S]"+" The admin "+addr[0]+" "+str(addr[1])+" has connected.",time.localtime())
+    info(out)
+def connected_admin_logined(addr):
+    out=time.strftime("[%H:%M:%S]"+" The admin "+addr[0]+" "+str(addr[1])+" has login.",time.localtime())
+    info(out)
+def connected_admin_loginfail(addr,recv_password):
+    out=time.strftime("[%H:%M:%S]"+" The admin "+addr[0]+" "+str(addr[1])+" login failed.He typed password is \""+recv_password+"\".",time.localtime())
+    info(out)
+def connected_admin_exit(addr):
+    out=time.strftime("[%H:%M:%S]"+" The admin "+addr[0]+" "+str(addr[1])+" exited.",time.localtime())
+    info(out)
 
 #Main codes.
 init()
