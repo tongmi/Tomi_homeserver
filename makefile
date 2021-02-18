@@ -17,7 +17,7 @@ debug:
 	rm ./config.json
 	rm -rf ./logs
 help:
-	#compile
+	#compile (1)
 	#clean
 	#install
 	#uninstall

@@ -116,7 +116,7 @@ class thread_server_ssh(threading.Thread):
     def run(self):
         ssh()
 
-# Define some functions.
+# Define some kernel functions.
 
 
 def info(str):

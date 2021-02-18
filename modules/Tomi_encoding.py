@@ -34,3 +34,4 @@ def decode(encoding):
         except Exception:
             code = code+encoding[i]
     return code
+
