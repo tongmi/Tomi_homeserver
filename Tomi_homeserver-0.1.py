@@ -369,17 +369,15 @@ def main():
     start_logs()
     init()
 
-
-# Main codes.
-if __name__ == "__main__":
-    main()
+# Wait
+def timeserver():
+    global server
     try:
         info("Start to accept users.")
         while True:
             c, addr = server.accept()
             connected(addr)
-            send_info = time.strftime("It is %Y-%m-%d %H:%M:%S now.",
-                                      time.localtime())
+            send_info = time.strftime("It is %Y-%m-%d %H:%M:%S now.", time.localtime())
             c.send(send_info.encode("utf-8"))
             c.close()
     except KeyboardInterrupt:
@@ -389,5 +387,24 @@ if __name__ == "__main__":
     except Exception as buf:
         server.close()
         err(str(buf))
+        info("Program is exiting.")
+        os._exit(0)
+
+
+class p_timeserver(threading.Thread):
+    def run(self):
+        timeserver()
+
+
+# Main codes.
+if __name__ == "__main__":
+    main()
+    p_t = p_timeserver()
+    p_t.start()
+    try:
+        while True:
+            exec(input(""))
+    except KeyboardInterrupt:
+        server.close()
         info("Program is exiting.")
         os._exit(0)
