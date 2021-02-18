@@ -154,7 +154,7 @@ def write_logs(string):
     else:
         return UNABLE_TO_DO
 
-
+# ---#############CUTING##############---#
 def connected(addr):
     out = time.strftime("[%H:%M:%S]"+" "+addr[0]+" "+str(addr[1]) +
                         " has connected.", time.localtime())
@@ -185,7 +185,7 @@ def connected_admin_exit(addr):
                         " "+str(addr[1]) + " exited.", time.localtime())
     info(out)
 
-# ---#############CUTING##############---#
+
 # Helpful infomation and information of the version.
 
 
