@@ -12,12 +12,14 @@ NO_ERROR = 0
 UNABLE_TO_DO = -1
 
 # Initialize the vars.
+Started_Time = time.time()
 Program_name = "Tomi_homeserver"
 Program_version = 0.1
 Program_logs = True
 Program_ssh = False
+Program_plugins = True
 Program_ssh_password = "031317"
-information_backup = {"hostname": "0.0.0.0", "port": 31313, "plugins": True, "version": 0}
+information_backup = {"hostname": "0.0.0.0", "port": 31313, "version": 0}
 information = information_backup
 keys = list(information.keys())
 server_tcp_listen = 5
@@ -36,6 +38,7 @@ Tomi_homeserver 0.1 Help
 -port/-Port/-p <port>     修改使用的端口（不修改config.json的配置）
 -ssh/-s/-S      启用远程ssh连接服务器
 -unlog/-ul      关闭日志流(实验功能)
+-unplugin/-upg   关闭插件功能(实验功能)
 
 """
 
@@ -235,7 +238,7 @@ def init():
     info("The programs started,initializing...")
     # Import some objects.
     global information, keys, information_backup, server, server_mode, \
-        server_tcp_listen, Program_ssh
+        server_tcp_listen, Program_ssh, Program_plugins
     # Initialize config.json file.
     if os.path.exists("config.json") is True:
         if os.path.isfile("config.json") is True:
@@ -277,6 +280,9 @@ def init():
                 os._exit(0)
         if sys.argv[i] == "-ssh" or sys.argv[i] == "-s" or sys.argv[i] == "-S":
             Program_ssh = True
+        if sys.argv[i] == "-unplugin" or sys.argv[i] == "-upg":
+            Program_plugins = False
+            info("The plugins function closed.")
     try:
         server.bind((information["hostname"], information["port"]))
     except socket.gaierror:
@@ -290,6 +296,7 @@ config.json\' to reset or free the port.")
         info("The server("+information["hostname"] +
              ") was running at the port "+str(information["port"])+".")
     if server_mode == socket.SOCK_DGRAM:
+        # Wait...
         pass
     else:
         server.listen(server_tcp_listen)
@@ -298,9 +305,13 @@ config.json\' to reset or free the port.")
         # Wait to be perfect Use the new threads. 2.6
         t_ssh = thread_server_ssh()
         t_ssh.start()
+    # Plugins Function
+    if Program_plugins is True:
+        pass
+    info("The server started successfully," + " took " + str(time.time()-Started_Time) +"s!")
+
+
 # Initialize sh mode to run some commands that you send.
-
-
 def ssh():
     # Waiting to be perfect. 2021.1.27
     global information
