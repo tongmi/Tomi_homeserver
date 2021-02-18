@@ -357,9 +357,9 @@ def main():
     help_and_so_on()
     start_logs()
     init()
+
+
 # Main codes.
-
-
 main()
 try:
     info("Start to accept users.")
