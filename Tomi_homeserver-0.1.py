@@ -7,6 +7,7 @@ import socket
 import time
 import json
 import threading
+import shutil
 # ERROR_CODE
 NO_ERROR = 0
 UNABLE_TO_DO = -1
@@ -120,19 +121,19 @@ class thread_server_ssh(threading.Thread):
 # Define some kernel functions.
 
 
-def info(str):
+def info(_str):
     str_type = if_main_thread()+"/"+"INFO"
-    write_screen(str_type, str)
+    write_screen(str_type, "\033[1;32m" + _str + "\033[0m")
 
 
-def warn(str):
+def warn(_str):
     str_type = if_main_thread()+"/"+"WARN"
-    write_screen(str_type, str)
+    write_screen(str_type, "\033[1;33m" + _str + "\033[0m")
 
 
-def err(str):
+def err(_str):
     str_type = if_main_thread()+"/"+"ERROR"
-    write_screen(str_type, str)
+    write_screen(str_type, "\033[1;31m" + _str + "\033[0m")
 
 
 def if_main_thread():
@@ -218,12 +219,10 @@ def start_logs():
                 os.mkdir("logs")
         else:
             os.mkdir("logs")
-        logs_name = time.strftime(r"logs/"+"%Y-%m-%d_%H-%M-%S.log",
-                                  time.localtime())
+        logs_name = time.strftime(r"logs/"+"%Y-%m-%d_%H-%M-%S.log", time.localtime())
         logs = open(logs_name, "w+")
         buffer = time.strftime("[%H:%M:%S]" + " [Main/KERNEL]:Create " +
-                               "the log \"" + logs_name + "\".\n",
-                               time.localtime())
+                               "the log \"" + logs_name + "\".\n", time.localtime())
         print(buffer, end="")
         logs.write(buffer)
         logs.flush()
@@ -308,17 +307,44 @@ config.json\' to reset or free the port.")
         t_ssh.start()
     # Plugins Function
     if Program_plugins is True:
-        datanames = os.listdir("./plugins")
-        for dataname in datanames:
-            if os.path.splitext(dataname)[1] == '.py': # 目录下包含.json的文件
-                plugin_name = os.path.splitext(dataname)[0]
-                info("Loading the plugin \"" + plugin_name + "\".")
-                try:
-                    __import__("plugins." + plugin_name)
-                    loaded_plugins.append(plugin_name)
-                except Exception as tmp:
-                    err("At the plugin \"" + plugin_name + "\".")
-                    err("Error happened: " + str(tmp))
+        try:
+            shutil.rmtree("./plugins/__pycache__")
+            info("Cleaned the \"__pycache__\".")
+        except Exception:
+            info("Have not cleaned the \"__pycache__\".")
+            pass
+        try:
+            datanames = os.listdir("./plugins")
+            for dataname in datanames:
+                if os.path.splitext(dataname)[1] == '.py': # 目录下包含.py的文件
+                    plugin_name = os.path.splitext(dataname)[0]
+                    info("Loading the plugin \"" + plugin_name + "\".")
+                    try:
+                        __import__("plugins." + plugin_name)
+                        loaded_plugins.append(plugin_name)
+                    except Exception as tmp:
+                        err("At the plugin \"" + plugin_name + "\".")
+                        err("Error happened: " + str(tmp))
+                if os.path.splitext(dataname)[1] == '.pyc': # 目录下包含.pyc的文件
+                    plugin_name = os.path.splitext(dataname)[0]
+                    info("Loading the plugin \"" + plugin_name + "\".")
+                    try:
+                        __import__("plugins." + plugin_name)
+                        loaded_plugins.append(plugin_name)
+                    except Exception as tmp:
+                        err("At the plugin \"" + plugin_name + "\".")
+                        err("Error happened: " + str(tmp))
+                if os.path.splitext(dataname)[1] == '.tomi': # 目录下包含.tomi的文件
+                    plugin_name = os.path.splitext(dataname)[0]
+                    info("Loading the plugin \"" + plugin_name + "\".")
+                    try:
+                        with open("./plugins/" + dataname, "r") as f:
+                            exec(f.read(-1))
+                    except Exception as tmp:
+                        err("At the plugin \"" + plugin_name + "\".")
+                        err("Error happened: " + str(tmp))
+        except Exception:
+            warn("No plugins are loaded.")
     info("The server started successfully," + " took " + str(time.time()-Started_Time) +"s!")
 
 
@@ -380,42 +406,21 @@ def main():
     start_logs()
     init()
 
-
-def timeserver():
-    global server
-    try:
-        info("Start to accept users.")
-        while True:
-            c, addr = server.accept()
-            connected(addr)
-            send_info = time.strftime("It is %Y-%m-%d %H:%M:%S now.", time.localtime())
-            c.send(send_info.encode("utf-8"))
-            c.close()
-    except KeyboardInterrupt:
-        server.close()
-        info("Program is exiting.")
-        os._exit(0)
-    except Exception as buf:
-        server.close()
-        err(str(buf))
-        info("Program is exiting.")
-        os._exit(0)
-
-
-class p_timeserver(threading.Thread):
-    def run(self):
-        timeserver()
-
-p_t = p_timeserver()
-p_t.start()
-
 # Main codes.
 if __name__ == "__main__":
     main()
     try:
         while True:
-            exec(input(""))
+            code = input("tomi>")
+            if code == "exit" or code == "Exit" or code == "EXIT":
+                raise(KeyboardInterrupt)
+            else:
+                exec(code)
     except KeyboardInterrupt:
         server.close()
         info("Program is exiting.")
         os._exit(0)
+
+
+
+
