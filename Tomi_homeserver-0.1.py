@@ -25,6 +25,7 @@ keys = list(information.keys())
 server_tcp_listen = 5
 server_mode = socket.SOCK_STREAM
 server = socket.socket(socket.AF_INET, server_mode)
+loaded_plugins = []
 
 # Help information var define.
 help_infomation = """
@@ -238,7 +239,7 @@ def init():
     info("The programs started,initializing...")
     # Import some objects.
     global information, keys, information_backup, server, server_mode, \
-        server_tcp_listen, Program_ssh, Program_plugins
+        server_tcp_listen, Program_ssh, Program_plugins, loaded_plugins
     # Initialize config.json file.
     if os.path.exists("config.json") is True:
         if os.path.isfile("config.json") is True:
@@ -307,7 +308,17 @@ config.json\' to reset or free the port.")
         t_ssh.start()
     # Plugins Function
     if Program_plugins is True:
-        pass
+        datanames = os.listdir("./plugins")
+        for dataname in datanames:
+            if os.path.splitext(dataname)[1] == '.py': # 目录下包含.json的文件
+                plugin_name = os.path.splitext(dataname)[0]
+                info("Loading the plugin \"" + plugin_name + "\".")
+                try:
+                    __import__("plugins." + plugin_name)
+                    loaded_plugins.append(plugin_name)
+                except Exception as tmp:
+                    err("At the plugin \"" + plugin_name + "\".")
+                    err("Error happened: " + str(tmp))
     info("The server started successfully," + " took " + str(time.time()-Started_Time) +"s!")
 
 
@@ -369,7 +380,7 @@ def main():
     start_logs()
     init()
 
-# Wait
+
 def timeserver():
     global server
     try:
@@ -395,12 +406,12 @@ class p_timeserver(threading.Thread):
     def run(self):
         timeserver()
 
+p_t = p_timeserver()
+p_t.start()
 
 # Main codes.
 if __name__ == "__main__":
     main()
-    p_t = p_timeserver()
-    p_t.start()
     try:
         while True:
             exec(input(""))

@@ -1,4 +1,4 @@
-compile: compile.py
+compile:
 	./compile.py
 	chmod 777 Tomi_homeserver.pyc
 clean: Tomi_homeserver.pyc
@@ -8,18 +8,25 @@ install:
 	chmod 777 Tomi_homeserver.pyc
 	mkdir outfile
 	mv ./Tomi_homeserver.pyc ./outfile/.
+	mkdir outfile/plugins
+	cp plugins/* outfile/plugins/.
 uninstall:
 	rm -rf ./outfile
-	rm config.json
-	rm -rf ./logs
 debug:
-	python3 ./outfile/Tomi_homeserver.pyc -s
-	rm ./config.json
-	rm -rf ./logs
+	bash debug.sh
+reinstall:
+	rm -rf ./outfile
+	./compile.py
+	chmod 777 Tomi_homeserver.pyc
+	mkdir outfile
+	mv ./Tomi_homeserver.pyc ./outfile/.
+	mkdir outfile/plugins
+	cp plugins/* outfile/plugins/.
 help:
 	#compile (1)
 	#clean
 	#install
 	#uninstall
 	#debug
+	#reinstall
 	#help
