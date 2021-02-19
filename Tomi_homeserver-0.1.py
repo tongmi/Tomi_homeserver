@@ -125,15 +125,29 @@ def info(_str):
     str_type = if_main_thread()+"/"+"INFO"
     write_screen(str_type, "\033[1;32m" + _str + "\033[0m")
 
+def info_nc(_str):
+    str_type = if_main_thread()+"/"+"INFO"
+    write_screen(str_type, _str)
+
 
 def warn(_str):
     str_type = if_main_thread()+"/"+"WARN"
     write_screen(str_type, "\033[1;33m" + _str + "\033[0m")
 
 
+def warn_nc(_str):
+    str_type = if_main_thread()+"/"+"WARN"
+    write_screen(str_type, _str)
+
+
 def err(_str):
     str_type = if_main_thread()+"/"+"ERROR"
     write_screen(str_type, "\033[1;31m" + _str + "\033[0m")
+
+def err_nc(_str):
+    str_type = if_main_thread()+"/"+"ERROR"
+    write_screen(str_type, _str)
+
 
 
 def if_main_thread():
@@ -300,6 +314,7 @@ config.json\' to reset or free the port.")
         try:
             datanames = os.listdir("./plugins")
             for dataname in datanames:
+                # 下次加入多线程
                 if os.path.splitext(dataname)[1] == '.py' or os.path.splitext(dataname)[1] == '.pyc': # 目录下包含.py .pyc的文件
                     plugin_name = os.path.splitext(dataname)[0]
                     info("Loading the plugin \"" + plugin_name + "\".")
