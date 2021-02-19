@@ -1,4 +1,7 @@
 import _thread as _t
+def connected(addr):
+    out = +addr[0]+" "+str(addr[1]) + " has connected."
+    info(out)
 def timeserver():
     global server
     try:

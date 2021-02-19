@@ -144,8 +144,7 @@ def if_main_thread():
 
 
 def write_screen(str_class, str):
-    out = time.strftime("[%H:%M:%S]"+" ["+str_class+"]:"+str+"\n",
-                        time.localtime())
+    out = time.strftime("[%H:%M:%S]"+" ["+str_class+"]:"+str+"\n",time.localtime())
     print(out, end="")
     write_logs(out)
 
@@ -160,37 +159,24 @@ def write_logs(string):
         return UNABLE_TO_DO
 
 # ---#############CUTING##############---#
-def connected(addr):
-    out = time.strftime("[%H:%M:%S]"+" "+addr[0]+" "+str(addr[1]) +
-                        " has connected.", time.localtime())
-    info(out)
-
-
 def connected_admin_connected(addr):
-    out = time.strftime("[%H:%M:%S]"+" The admin "+addr[0]+" "+str(addr[1]) +
-                        " has connected.", time.localtime())
+    out = "The admin "+addr[0]+" "+str(addr[1]) + " has connected."
     info(out)
 
 
 def connected_admin_logined(addr):
-    out = time.strftime("[%H:%M:%S]"+" The admin "+addr[0]+" "+str(addr[1]) +
-                        " has login.", time.localtime())
+    out = "The admin "+addr[0]+" "+str(addr[1]) + " has login."
     info(out)
 
 
 def connected_admin_loginfail(addr, recv_password):
-    out = time.strftime("[%H:%M:%S]"+" The admin "+addr[0]+" "+str(addr[1]) +
-                        " login failed.He typed password is \""+recv_password +
-                        "\".", time.localtime())
+    out = "The admin " + addr[0] + " " + str(addr[1]) + " login failed.He typed password is \"" + recv_password + "\"."
     info(out)
 
 
 def connected_admin_exit(addr):
-    out = time.strftime("[%H:%M:%S]"+" The admin "+addr[0] +
-                        " "+str(addr[1]) + " exited.", time.localtime())
+    out = "The admin "+addr[0] + " "+str(addr[1]) + " exited."
     info(out)
-
-
 # Helpful infomation and information of the version.
 
 
@@ -221,15 +207,13 @@ def start_logs():
             os.mkdir("logs")
         logs_name = time.strftime(r"logs/"+"%Y-%m-%d_%H-%M-%S.log", time.localtime())
         logs = open(logs_name, "w+")
-        buffer = time.strftime("[%H:%M:%S]" + " [Main/KERNEL]:Create " +
-                               "the log \"" + logs_name + "\".\n", time.localtime())
+        buffer = time.strftime("[%H:%M:%S]" + " [Main/KERNEL]:Create " + "the log \"" + logs_name + "\".\n", time.localtime())
         print(buffer, end="")
         logs.write(buffer)
         logs.flush()
         del buffer
     else:
-        print(time.strftime("[%H:%M:%S]"+" [Main/KERNEL]:The stream of logs " +
-                            "closed.", time.localtime()))
+        print(time.strftime("[%H:%M:%S]"+" [Main/KERNEL]:The stream of logs " + "closed.", time.localtime()))
 # Initialize the program.
 
 
@@ -316,7 +300,7 @@ config.json\' to reset or free the port.")
         try:
             datanames = os.listdir("./plugins")
             for dataname in datanames:
-                if os.path.splitext(dataname)[1] == '.py': # 目录下包含.py的文件
+                if os.path.splitext(dataname)[1] == '.py' or os.path.splitext(dataname)[1] == '.pyc': # 目录下包含.py .pyc的文件
                     plugin_name = os.path.splitext(dataname)[0]
                     info("Loading the plugin \"" + plugin_name + "\".")
                     try:
@@ -325,24 +309,18 @@ config.json\' to reset or free the port.")
                     except Exception as tmp:
                         err("At the plugin \"" + plugin_name + "\".")
                         err("Error happened: " + str(tmp))
-                if os.path.splitext(dataname)[1] == '.pyc': # 目录下包含.pyc的文件
-                    plugin_name = os.path.splitext(dataname)[0]
-                    info("Loading the plugin \"" + plugin_name + "\".")
-                    try:
-                        __import__("plugins." + plugin_name)
-                        loaded_plugins.append(plugin_name)
-                    except Exception as tmp:
-                        err("At the plugin \"" + plugin_name + "\".")
-                        err("Error happened: " + str(tmp))
+                    continue
                 if os.path.splitext(dataname)[1] == '.tomi': # 目录下包含.tomi的文件
                     plugin_name = os.path.splitext(dataname)[0]
                     info("Loading the plugin \"" + plugin_name + "\".")
                     try:
                         with open("./plugins/" + dataname, "r") as f:
                             exec(f.read(-1))
+                        loaded_plugins.append(plugin_name)
                     except Exception as tmp:
                         err("At the plugin \"" + plugin_name + "\".")
                         err("Error happened: " + str(tmp))
+                    continue
         except Exception:
             warn("No plugins are loaded.")
     info("The server started successfully," + " took " + str(time.time()-Started_Time) +"s!")
@@ -409,13 +387,19 @@ def main():
 # Main codes.
 if __name__ == "__main__":
     main()
+    time.sleep(0.3)
     try:
         while True:
             code = input("tomi>")
             if code == "exit" or code == "Exit" or code == "EXIT":
                 raise(KeyboardInterrupt)
+            elif code == "list":
+                print(loaded_plugins)
             else:
-                exec(code)
+                try:
+                    exec(code)
+                except Exception as buf:
+                    err("语句执行时有错误产生："+str(buf))
     except KeyboardInterrupt:
         server.close()
         info("Program is exiting.")
