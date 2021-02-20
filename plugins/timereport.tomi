@@ -1,14 +1,13 @@
-from Tomi_homeserver import *
 class timereport(plugin):
     Name = "timereport"
     Version = "1.0"
-    def timeserver_connected(self,addr):
-        out = "[Timereport]:" + addr[0] + " " + str(addr[1]) + " has connected."
-        info(out)
+    def timeserver_connected(self, addr):
+        out = addr[0] + " " + str(addr[1]) + " has connected."
+        self.info(out)
     def run(self):
         global server
         try:
-            info("[Timereport]:Start to accept users.")
+            self.info("Start to accept users.")
             while True:
                 c, addr = server.accept()
                 self.timeserver_connected(addr)
@@ -17,14 +16,14 @@ class timereport(plugin):
                 c.close()
         except KeyboardInterrupt:
             server.close()
-            info("[Timereport]:The plugin is exiting.")
+            self.info("The plugin is exiting.")
         except Exception as buf:
             server.close()
             err(str(buf))
-            info("[Timereport]:The plugin is exiting.")
+            self.info("The plugin is exiting.")
     def __del__(self):
         server.close()
-        info("[Timereport]:The plugin is exiting.")
+        self.info("The plugin is exiting.")
 timereport_thread = timereport()
-timereport_thread.start()
 plugin_name = timereport_thread.Name
+timereport_thread.start()

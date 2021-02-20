@@ -27,7 +27,10 @@ server_tcp_listen = 5
 server_mode = socket.SOCK_STREAM
 server = socket.socket(socket.AF_INET, server_mode)
 plugin_name = ""
+loaded_tomi_plugins = []
 loaded_plugins_filename = []
+register_command_list = []
+register_function_list = []
 ps1 = "tomi>"
 
 # Help information var define.
@@ -121,6 +124,56 @@ class plugin(threading.Thread):
     Name = ""
     Version = ""
 
+    def register_command(self, command, function):
+        try:
+            register_command_list.append(str(command))
+            register_function_list.append(function)
+            return NO_ERROR
+        except Exception:
+            return UNABLE_TO_DO
+
+    def info(self, _str):
+        try:
+            info(f"[{self.Name}]:" + str(_str))
+            return NO_ERROR
+        except Exception:
+            return UNABLE_TO_DO
+
+    def warn(self, _str):
+        try:
+            warn(f"[{self.Name}]:" + str(_str))
+            return NO_ERROR
+        except Exception:
+            return UNABLE_TO_DO
+
+    def err(self, _str):
+        try:
+            err(f"[{self.Name}]:" + str(_str))
+            return NO_ERROR
+        except Exception:
+            return UNABLE_TO_DO
+
+    def info_nc(self, _str):
+        try:
+            info_nc(f"[{self.Name}]:" + str(_str))
+            return NO_ERROR
+        except Exception:
+            return UNABLE_TO_DO
+
+    def warn_nc(self, _str):
+        try:
+            warn_nc(f"[{self.Name}]:" + str(_str))
+            return NO_ERROR
+        except Exception:
+            return UNABLE_TO_DO
+
+    def err_nc(self, _str):
+        try:
+            err_nc(f"[{self.Name}]:" + str(_str))
+            return NO_ERROR
+        except Exception:
+            return UNABLE_TO_DO
+
 
 class thread_server_ssh(threading.Thread):
     def run(self):
@@ -164,7 +217,7 @@ def if_main_thread():
     if threading.current_thread().name == "MainThread":
         return "Main"
     else:
-        return "Thread-" + str(threading.current_thread().ident)
+        return "Thread"
 
 
 def write_screen(str_class, _str, beginning = "", end = "\n"):
@@ -426,6 +479,8 @@ if __name__ == "__main__":
                         with open("./plugins/" + dataname, "r") as f:
                             exec(f.read(-1))
                         loaded_plugins_filename.append(plugin_name)
+                        loaded_tomi_plugins.append(plugin_name)
+                        info("Loaded the tomi plugin \"" + plugin_name + "\" successfully.")
                     except Exception as tmp:
                         err("At the plugin \"" + plugin_name + "\".")
                         err("Error happened: " + str(tmp))
@@ -442,6 +497,8 @@ if __name__ == "__main__":
                 raise(KeyboardInterrupt)
             elif code == "list":
                 print(loaded_plugins_filename)
+            elif code == "tp":
+                print(loaded_tomi_plugins)
             else:
                 try:
                     exec(code)
