@@ -32,7 +32,7 @@ ps1 = "tomi>"
 # Help information var define.
 help_infomation = """
 
-Tomi_homeserver 0.1 Help
+Tomi_homeserver Help
 
 选项：
 -h/-help/-Help      获取帮助.
@@ -40,6 +40,7 @@ Tomi_homeserver 0.1 Help
 -hostname/-h/-ip <hostname>     修改使用的主机名（不修改config.json的配置）
 -port/-Port/-p <port>     修改使用的端口（不修改config.json的配置）
 -ssh/-s/-S      启用远程ssh连接服务器
+-password/-pd   指定ssh密码
 -unlog/-ul      关闭日志流(实验功能)
 -unplugin/-upg   关闭插件功能(实验功能)
 
@@ -182,7 +183,8 @@ def write_logs(string):
     else:
         return UNABLE_TO_DO
 
-# ---#############CUTING##############---#
+# ---#############CUTING##############--- #
+# ssh functions
 def connected_admin_connected(addr):
     out = "The admin "+addr[0]+" "+str(addr[1]) + " has connected."
     info(out)
@@ -212,6 +214,7 @@ def help_and_so_on():
                 Program_logs = False
         if sys.argv[i] == "-h" or sys.argv[i] == "-help" \
                 or sys.argv[i] == "-Help":
+            print(Program_name+" "+str(Program_version))
             print(help_infomation)
             os._exit(0)
         if sys.argv[i] == "-v" or sys.argv[i] == "-version" or \
@@ -246,7 +249,13 @@ def init():
     info("The programs started,initializing...")
     # Import some objects.
     global information, keys, information_backup, server, server_mode, \
-        server_tcp_listen, Program_ssh, Program_plugins
+        server_tcp_listen, Program_ssh, Program_plugins, Program_ssh_password
+    # Create plugins dir.
+    if os.path.exists("plugins") is True:
+        if os.path.isdir("plugins") is False:
+            os.mkdir("plugins")
+    else:
+        os.mkdir("plugins")
     # Initialize config.json file.
     if os.path.exists("config.json") is True:
         if os.path.isfile("config.json") is True:
@@ -277,6 +286,11 @@ def init():
                 sys.argv[i] == "-ip":
             information["hostname"] = sys.argv[i+1]
             info("Reset the hostname("+sys.argv[i+1]+") successfully.")
+            continue
+        if sys.argv[i] == "-password" or sys.argv[i] == "-pd":
+            Program_ssh_password = sys.argv[i+1]
+            info("The ssh password was set.")
+            continue
         if sys.argv[i] == "-port" or sys.argv[i] == "-Port" or \
                 sys.argv[i] == "-p":
             try:
@@ -288,9 +302,11 @@ def init():
                 os._exit(0)
         if sys.argv[i] == "-ssh" or sys.argv[i] == "-s" or sys.argv[i] == "-S":
             Program_ssh = True
+            continue
         if sys.argv[i] == "-unplugin" or sys.argv[i] == "-upg":
             Program_plugins = False
             info("The plugins function closed.")
+            continue
     try:
         server.bind((information["hostname"], information["port"]))
     except socket.gaierror:
