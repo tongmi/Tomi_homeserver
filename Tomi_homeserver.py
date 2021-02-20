@@ -20,7 +20,7 @@ Program_logs = True
 Program_ssh = False
 Program_plugins = True
 Program_ssh_password = "031317"
-information_backup = {"hostname": "0.0.0.0", "port": 31313, "version": 0}
+information_backup = {"hostname": "0.0.0.0", "port": 31313, "ssh_password": "031317", "version": 0}
 information = information_backup
 keys = list(information.keys())
 server_tcp_listen = 5
@@ -280,6 +280,8 @@ def init():
                 json.dump(information, f)
             warn("Config was reset.Because the config was not correct.")
             break
+    # Write the ssh password.
+    Program_ssh_password = information["ssh_password"]
     # Reset some configs and be for some helps.
     for i in range(0, len(sys.argv)):
         if sys.argv[i] == "-hostname" or sys.argv[i] == "-h" or \
@@ -429,6 +431,7 @@ if __name__ == "__main__":
     try:
         while True:
             code = input(ps1)
+            write_logs(ps1 + code)
             if code == "exit" or code == "Exit" or code == "EXIT":
                 raise(KeyboardInterrupt)
             elif code == "list":
