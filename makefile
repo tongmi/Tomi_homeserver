@@ -22,6 +22,12 @@ reinstall:
 	mv ./Tomi_homeserver.pyc ./outfile/.
 	mkdir outfile/plugins
 	cp plugins/* outfile/plugins/.
+pull:
+	git pull
+login:
+	bash .git_login.sh
+push:
+	git push
 help:
 	#compile (1)
 	#clean
@@ -29,4 +35,7 @@ help:
 	#uninstall
 	#debug
 	#reinstall
+	#pull
+	#login
+	#push
 	#help
