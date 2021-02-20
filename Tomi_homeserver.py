@@ -122,33 +122,34 @@ class thread_server_ssh(threading.Thread):
 # Define some kernel functions.
 
 
-def info(_str):
+def info(_str, beginning = "", end = "\n"):
     str_type = if_main_thread()+"/"+"INFO"
-    write_screen_nc(str_type, "\033[1;32m" + _str + "\033[0m", _str)
+    write_screen_nc(str_type, "\033[1;32m" + _str + "\033[0m", _str, beginning, end)
 
-def info_nc(_str):
+
+def info_nc(_str, beginning = "", end = "\n"):
     str_type = if_main_thread()+"/"+"INFO"
-    write_screen(str_type, _str)
+    write_screen(str_type, _str, beginning, end)
 
 
-def warn(_str):
+def warn(_str, beginning = "", end = "\n"):
     str_type = if_main_thread()+"/"+"WARN"
-    write_screen_nc(str_type, "\033[1;33m" + _str + "\033[0m", _str)
+    write_screen_nc(str_type, "\033[1;33m" + _str + "\033[0m", _str, beginning, end)
 
 
-def warn_nc(_str):
+def warn_nc(_str, beginning = "", end = "\n"):
     str_type = if_main_thread()+"/"+"WARN"
-    write_screen(str_type, _str)
+    write_screen(str_type, _str, beginning, end)
 
 
-def err(_str):
+def err(_str, beginning = "", end = "\n"):
     str_type = if_main_thread()+"/"+"ERROR"
-    write_screen_nc(str_type, "\033[1;31m" + _str + "\033[0m", _str)
+    write_screen_nc(str_type, "\033[1;31m" + _str + "\033[0m", _str, beginning, end)
 
 
-def err_nc(_str):
+def err_nc(_str, beginning = "", end = "\n"):
     str_type = if_main_thread()+"/"+"ERROR"
-    write_screen(str_type, _str)
+    write_screen(str_type, _str, beginning, end)
 
 
 
@@ -159,16 +160,16 @@ def if_main_thread():
         return "Thread"
 
 
-def write_screen(str_class, _str):
-    out = time.strftime("[%H:%M:%S]"+" [" + str_class + "]:"+ _str +"\n",time.localtime())
-    print(out, end="")
+def write_screen(str_class, _str, beginning = "", end = "\n"):
+    out = time.strftime(beginning + "[%H:%M:%S]"+" [" + str_class + "]:"+ str(_str) + end, time.localtime())
+    print(out, end = "")
     write_logs(out)
 
 
-def write_screen_nc(str_class, _str, logs_out):
-    out = time.strftime("[%H:%M:%S]"+" [" + str_class + "]:"+ _str +"\n",time.localtime())
-    print(out, end="")
-    _out = time.strftime("[%H:%M:%S]"+" [" + str_class + "]:"+ logs_out +"\n",time.localtime())
+def write_screen_nc(str_class, _str, logs_out, beginning = "", end = "\n"):
+    out = time.strftime(beginning + "[%H:%M:%S]"+" [" + str_class + "]:"+ str(_str) + end, time.localtime())
+    print(out, end = "")
+    _out = time.strftime("[%H:%M:%S]"+" [" + str_class + "]:"+ logs_out + end, time.localtime())
     write_logs(_out)
 
 
