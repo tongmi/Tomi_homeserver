@@ -27,6 +27,7 @@ server_tcp_listen = 5
 server_mode = socket.SOCK_STREAM
 server = socket.socket(socket.AF_INET, server_mode)
 loaded_plugins = []
+ps1 = "tomi>"
 
 # Help information var define.
 help_infomation = """
@@ -123,7 +124,7 @@ class thread_server_ssh(threading.Thread):
 
 def info(_str):
     str_type = if_main_thread()+"/"+"INFO"
-    write_screen(str_type, "\033[1;32m" + _str + "\033[0m")
+    write_screen_nc(str_type, "\033[1;32m" + _str + "\033[0m", _str)
 
 def info_nc(_str):
     str_type = if_main_thread()+"/"+"INFO"
@@ -132,7 +133,7 @@ def info_nc(_str):
 
 def warn(_str):
     str_type = if_main_thread()+"/"+"WARN"
-    write_screen(str_type, "\033[1;33m" + _str + "\033[0m")
+    write_screen_nc(str_type, "\033[1;33m" + _str + "\033[0m", _str)
 
 
 def warn_nc(_str):
@@ -142,7 +143,8 @@ def warn_nc(_str):
 
 def err(_str):
     str_type = if_main_thread()+"/"+"ERROR"
-    write_screen(str_type, "\033[1;31m" + _str + "\033[0m")
+    write_screen_nc(str_type, "\033[1;31m" + _str + "\033[0m", _str)
+
 
 def err_nc(_str):
     str_type = if_main_thread()+"/"+"ERROR"
@@ -157,10 +159,17 @@ def if_main_thread():
         return "Thread"
 
 
-def write_screen(str_class, str):
-    out = time.strftime("[%H:%M:%S]"+" ["+str_class+"]:"+str+"\n",time.localtime())
+def write_screen(str_class, _str):
+    out = time.strftime("[%H:%M:%S]"+" [" + str_class + "]:"+ _str +"\n",time.localtime())
     print(out, end="")
     write_logs(out)
+
+
+def write_screen_nc(str_class, _str, logs_out):
+    out = time.strftime("[%H:%M:%S]"+" [" + str_class + "]:"+ _str +"\n",time.localtime())
+    print(out, end="")
+    _out = time.strftime("[%H:%M:%S]"+" [" + str_class + "]:"+ logs_out +"\n",time.localtime())
+    write_logs(_out)
 
 
 def write_logs(string):
@@ -236,7 +245,7 @@ def init():
     info("The programs started,initializing...")
     # Import some objects.
     global information, keys, information_backup, server, server_mode, \
-        server_tcp_listen, Program_ssh, Program_plugins, loaded_plugins
+        server_tcp_listen, Program_ssh, Program_plugins
     # Initialize config.json file.
     if os.path.exists("config.json") is True:
         if os.path.isfile("config.json") is True:
@@ -298,47 +307,6 @@ config.json\' to reset or free the port.")
         pass
     else:
         server.listen(server_tcp_listen)
-    # If ssh service is on,run this codes.
-    if Program_ssh is True:
-        # Wait to be perfect Use the new threads. 2.6
-        t_ssh = thread_server_ssh()
-        t_ssh.start()
-    # Plugins Function
-    if Program_plugins is True:
-        try:
-            shutil.rmtree("./plugins/__pycache__")
-            info("Cleaned the \"__pycache__\".")
-        except Exception:
-            info("Have not cleaned the \"__pycache__\".")
-            pass
-        try:
-            datanames = os.listdir("./plugins")
-            for dataname in datanames:
-                # 下次加入多线程
-                if os.path.splitext(dataname)[1] == '.py' or os.path.splitext(dataname)[1] == '.pyc': # 目录下包含.py .pyc的文件
-                    plugin_name = os.path.splitext(dataname)[0]
-                    info("Loading the plugin \"" + plugin_name + "\".")
-                    try:
-                        __import__("plugins." + plugin_name)
-                        loaded_plugins.append(plugin_name)
-                    except Exception as tmp:
-                        err("At the plugin \"" + plugin_name + "\".")
-                        err("Error happened: " + str(tmp))
-                    continue
-                if os.path.splitext(dataname)[1] == '.tomi': # 目录下包含.tomi的文件
-                    plugin_name = os.path.splitext(dataname)[0]
-                    info("Loading the plugin \"" + plugin_name + "\".")
-                    try:
-                        with open("./plugins/" + dataname, "r") as f:
-                            exec(f.read(-1))
-                        loaded_plugins.append(plugin_name)
-                    except Exception as tmp:
-                        err("At the plugin \"" + plugin_name + "\".")
-                        err("Error happened: " + str(tmp))
-                    continue
-        except Exception:
-            warn("No plugins are loaded.")
-    info("The server started successfully," + " took " + str(time.time()-Started_Time) +"s!")
 
 
 # Initialize sh mode to run some commands that you send.
@@ -394,18 +362,56 @@ Type \'exit\' can cut the connecting.(UTF-8)".encode("utf-8"))
         info("Ssh service is exiting.")
 
 
-def main():
+# Main codes.
+if __name__ == "__main__":
     help_and_so_on()
     start_logs()
     init()
-
-# Main codes.
-if __name__ == "__main__":
-    main()
+    # If ssh service is on,run this codes.
+    if Program_ssh is True:
+        # Wait to be perfect Use the new threads. 2.6
+        t_ssh = thread_server_ssh()
+        t_ssh.start()
+    # Plugins Function
+    if Program_plugins is True:
+        try:
+            shutil.rmtree("./plugins/__pycache__")
+            info("Cleaned the \"__pycache__\".")
+        except Exception:
+            info("Have not cleaned the \"__pycache__\".")
+            pass
+        try:
+            datanames = os.listdir("./plugins")
+            for dataname in datanames:
+                # 下次加入多线程
+                if os.path.splitext(dataname)[1] == '.py' or os.path.splitext(dataname)[1] == '.pyc': # 目录下包含.py .pyc的文件
+                    plugin_name = os.path.splitext(dataname)[0]
+                    info("Loading the plugin \"" + plugin_name + "\".")
+                    try:
+                        __import__("plugins." + plugin_name)
+                        loaded_plugins.append(plugin_name)
+                    except Exception as tmp:
+                        err("At the plugin \"" + plugin_name + "\".")
+                        err("Error happened: " + str(tmp))
+                    continue
+                if os.path.splitext(dataname)[1] == '.tomi': # 目录下包含.tomi的文件
+                    plugin_name = os.path.splitext(dataname)[0]
+                    info("Loading the plugin \"" + plugin_name + "\".")
+                    try:
+                        with open("./plugins/" + dataname, "r") as f:
+                            exec(f.read(-1))
+                        loaded_plugins.append(plugin_name)
+                    except Exception as tmp:
+                        err("At the plugin \"" + plugin_name + "\".")
+                        err("Error happened: " + str(tmp))
+                    continue
+        except Exception:
+            warn("No plugins are loaded.")
+    info("The server started successfully," + " took " + str(time.time()-Started_Time) +"s!")
     time.sleep(0.3)
     try:
         while True:
-            code = input("tomi>")
+            code = input(ps1)
             if code == "exit" or code == "Exit" or code == "EXIT":
                 raise(KeyboardInterrupt)
             elif code == "list":
@@ -419,7 +425,8 @@ if __name__ == "__main__":
         server.close()
         info("Program is exiting.")
         os._exit(0)
-
-
+else:
+    Program_logs = False
+    info("进入插件测试模式.")
 
 
