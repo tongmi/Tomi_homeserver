@@ -26,7 +26,8 @@ keys = list(information.keys())
 server_tcp_listen = 5
 server_mode = socket.SOCK_STREAM
 server = socket.socket(socket.AF_INET, server_mode)
-loaded_plugins = []
+plugin_name = ""
+loaded_plugins_filename = []
 ps1 = "tomi>"
 
 # Help information var define.
@@ -116,6 +117,11 @@ class socket_client:
             return UNABLE_TO_DO
 
 
+class plugin(threading.Thread):
+    Name = ""
+    Version = ""
+
+
 class thread_server_ssh(threading.Thread):
     def run(self):
         ssh()
@@ -158,7 +164,7 @@ def if_main_thread():
     if threading.current_thread().name == "MainThread":
         return "Main"
     else:
-        return "Thread"
+        return "Thread-" + str(threading.current_thread().ident)
 
 
 def write_screen(str_class, _str, beginning = "", end = "\n"):
@@ -408,7 +414,7 @@ if __name__ == "__main__":
                     info("Loading the plugin \"" + plugin_name + "\".")
                     try:
                         __import__("plugins." + plugin_name)
-                        loaded_plugins.append(plugin_name)
+                        loaded_plugins_filename.append(plugin_name)
                     except Exception as tmp:
                         err("At the plugin \"" + plugin_name + "\".")
                         err("Error happened: " + str(tmp))
@@ -419,7 +425,7 @@ if __name__ == "__main__":
                     try:
                         with open("./plugins/" + dataname, "r") as f:
                             exec(f.read(-1))
-                        loaded_plugins.append(plugin_name)
+                        loaded_plugins_filename.append(plugin_name)
                     except Exception as tmp:
                         err("At the plugin \"" + plugin_name + "\".")
                         err("Error happened: " + str(tmp))
@@ -435,7 +441,7 @@ if __name__ == "__main__":
             if code == "exit" or code == "Exit" or code == "EXIT":
                 raise(KeyboardInterrupt)
             elif code == "list":
-                print(loaded_plugins)
+                print(loaded_plugins_filename)
             else:
                 try:
                     exec(code)

@@ -1,28 +1,30 @@
-import _thread as _t
-def timeserver_connected(addr):
-    out = "[Timeserver]:" + addr[0] + " " + str(addr[1]) + " has connected."
-    info(out)
-def timeserver_main():
-    global server
-    try:
-        info("[Timeserver]:Start to accept users.")
-        while True:
-            c, addr = server.accept()
-            timeserver_connected(addr)
-            send_info = time.strftime("It is %Y-%m-%d %H:%M:%S now.", time.localtime())
-            c.send(send_info.encode("utf-8"))
-            c.close()
-    except KeyboardInterrupt:
-        server.close()
-        info("Program is exiting.")
-        os._exit(0)
-    except Exception as buf:
-        server.close()
-        err(str(buf))
-        info("Program is exiting.")
-        os._exit(0)
-class timereport(threading.Thread):
+from Tomi_homeserver import *
+class timereport(plugin):
+    Name = "timereport"
+    Version = "1.0"
+    def timeserver_connected(self,addr):
+        out = "[Timereport]:" + addr[0] + " " + str(addr[1]) + " has connected."
+        info(out)
     def run(self):
-        timeserver_main()
+        global server
+        try:
+            info("[Timereport]:Start to accept users.")
+            while True:
+                c, addr = server.accept()
+                self.timeserver_connected(addr)
+                send_info = time.strftime("It is %Y-%m-%d %H:%M:%S now.", time.localtime())
+                c.send(send_info.encode("utf-8"))
+                c.close()
+        except KeyboardInterrupt:
+            server.close()
+            info("[Timereport]:The plugin is exiting.")
+        except Exception as buf:
+            server.close()
+            err(str(buf))
+            info("[Timereport]:The plugin is exiting.")
+    def __del__(self):
+        server.close()
+        info("[Timereport]:The plugin is exiting.")
 timereport_thread = timereport()
 timereport_thread.start()
+plugin_name = timereport_thread.Name
