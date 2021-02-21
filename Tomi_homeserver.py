@@ -485,8 +485,9 @@ if __name__ == "__main__":
                         err("At the plugin \"" + plugin_name + "\".")
                         err("Error happened: " + str(tmp))
                     continue
+            info(str(len(loaded_plugins_filename)) + "plugins are loaded.")
         except Exception:
-            warn("No plugins are loaded.")
+            warn("0 plugins are loaded.")
     info("The server started successfully," + " took " + str(time.time()-Started_Time) +"s!")
     time.sleep(0.3)
     try:
