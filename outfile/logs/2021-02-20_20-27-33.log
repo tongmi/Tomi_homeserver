@@ -1,0 +1,12 @@
+[20:27:33] [Main/KERNEL]:Create the log "logs/2021-02-20_20-27-33.log".
+[20:27:33] [Main/INFO]:The programs started,initializing...
+[20:27:33] [Main/INFO]:The server(0.0.0.0) was running at the port 31313.
+[20:27:33] [Thread/INFO]:Ssh service of the server(0.0.0.0) was running at the port 31314.
+[20:27:33] [Main/INFO]:Cleaned the "__pycache__".
+[20:27:33] [Main/INFO]:Loading the plugin "Basic_Package".
+[20:27:33] [Main/INFO]:Loading the plugin "timereport".
+[20:27:33] [Thread/INFO]:[timereport]:Start to accept users.
+[20:27:33] [Main/INFO]:Loaded the tomi plugin "timereport" successfully.
+[20:27:33] [Main/INFO]:Loading the plugin "timeserver".
+[20:27:33] [Main/INFO]:The server started successfully, took 0.007693767547607422s!
+tomi>exit[20:27:42] [Main/INFO]:Program is exiting.

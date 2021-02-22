@@ -28,6 +28,10 @@ login:
 	bash .git_login.sh
 push:
 	git push
+github:
+	git remote set-url origin https://github.com/tongmi/Tomi_homeserver
+gitee:
+	git remote set-url origin https://gitee.com/tongmi/Tomi_homeserver
 help:
 	#compile (1)
 	#clean
@@ -38,4 +42,6 @@ help:
 	#pull
 	#login
 	#push
+	#github
+	#gitee
 	#help
