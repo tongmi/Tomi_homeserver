@@ -13,4 +13,3 @@ try:
     print("常数项为:", c_f)
 except Exception:
     print("不存在。")
-
